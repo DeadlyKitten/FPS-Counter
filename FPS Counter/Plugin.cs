@@ -1,62 +1,27 @@
 ﻿using IPA;
-using IPA.Config;
-using IPA.Utilities;
 using UnityEngine.SceneManagement;
-using IPALogger = IPA.Logging.Logger;
+using Logger = FPS_Counter.Logger;
+using CountersPlus.Custom;
 
 namespace FPS_Counter
 {
     public class Plugin : IBeatSaberPlugin
     {
-        internal static Ref<PluginConfig> config;
-        internal static IConfigProvider configProvider;
+        public void Init() { }
 
-        public void Init(IPALogger logger, [Config.Prefer("json")] IConfigProvider cfgProvider)
-        {
-            Logger.log = logger;
-            configProvider = cfgProvider;
+        public void OnApplicationStart() { }
 
-            config = cfgProvider.MakeLink<PluginConfig>((p, v) =>
-            {
-                if (v.Value == null || v.Value.RegenerateConfig)
-                    p.Store(v.Value = new PluginConfig() { RegenerateConfig = false });
-                config = v;
-            });
-        }
+        public void OnApplicationQuit() { }
 
-        public void OnApplicationStart()
-        {
-            Logger.log.Debug("OnApplicationStart");
-        }
+        public void OnFixedUpdate() { }
 
-        public void OnApplicationQuit()
-        {
-            Logger.log.Debug("OnApplicationQuit");
-        }
+        public void OnUpdate() { }
 
-        public void OnFixedUpdate()
-        {
+        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene) { }
 
-        }
+        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode) { }
 
-        public void OnUpdate()
-        {
+        public void OnSceneUnloaded(Scene scene) { }
 
-        }
-
-        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
-        {
-
-        }
-
-        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
-        {
-
-        }
-
-        public void OnSceneUnloaded(Scene scene)
-        {
-
-        }
     }
 }
