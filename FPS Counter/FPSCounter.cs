@@ -92,19 +92,21 @@ namespace FPS_Counter
         float numFrames;
         float lastFrameTime;
         float nextCounterUpdate = Time.time + Config.UpdateRate;
+        float ringFillPercent = 1;
 
         private void Update()
         {
             if (Time.time > nextCounterUpdate)
             {
                 var fps = Mathf.Round(numFrames / (Time.time - lastFrameTime));
-                _counter.text = $"FPS\n{String.Format("{0:0}", fps)}";
-                if (_displayRing) _image.fillAmount = fps / (float)_targetFramerate;
+                _counter.text = $"FPS\n{fps}";
+                if (_displayRing) ringFillPercent = fps / (float)_targetFramerate;
                 lastFrameTime = nextCounterUpdate;
                 nextCounterUpdate += _updateRate;
                 numFrames = 0;
             }
 
+            if (_displayRing) _image.fillAmount = Mathf.Lerp(_image.fillAmount, ringFillPercent, 0.5f);
             numFrames++;
         }
     }
