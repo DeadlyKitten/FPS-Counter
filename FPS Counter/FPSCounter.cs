@@ -19,6 +19,7 @@ namespace FPS_Counter
         private Image _image;
         private float _updateRate;
         private bool _displayRing;
+        private bool _useColors;
 
         private void Awake()
         {
@@ -37,8 +38,10 @@ namespace FPS_Counter
         private void Init()
         {
             _targetFramerate = (int) XRDevice.refreshRate;
+            _targetFramerate = 400;
             _updateRate = Config.UpdateRate;
             _displayRing = Config.ShowRing;
+            _useColors = Config.UseColors;
             Logger.Log($"Target framerate = {_targetFramerate.ToString()}");
 
             Canvas canvas = gameObject.AddComponent<Canvas>();
@@ -100,13 +103,39 @@ namespace FPS_Counter
             {
                 var fps = Mathf.Round(numFrames / (Time.time - lastFrameTime));
                 _counter.text = $"FPS\n{fps}";
-                if (_displayRing) ringFillPercent = fps / (float)_targetFramerate;
+                if (_displayRing)
+                {
+                    ringFillPercent = fps / (float)_targetFramerate;
+                    if (_useColors)
+                    {
+                        if (ringFillPercent > 0.95f)
+                        {
+                            _image.color = Color.green;
+                            _counter.color = Color.green;
+                        }
+                        else if (ringFillPercent > 0.7f)
+                        {
+                            _image.color = Color.yellow;
+                            _counter.color = Color.yellow;
+                        }
+                        else if (ringFillPercent > 0.5f)
+                        {
+                            _image.color = new Color(1, 0.64f, 0);
+                            _counter.color = new Color(1, 0.64f, 0);
+                        }
+                        else
+                        {
+                            _image.color = Color.red;
+                            _counter.color = Color.red;
+                        }
+                    }
+                }
                 lastFrameTime = nextCounterUpdate;
                 nextCounterUpdate += _updateRate;
                 numFrames = 0;
             }
 
-            if (_displayRing) _image.fillAmount = Mathf.Lerp(_image.fillAmount, ringFillPercent, 0.5f);
+            if (_displayRing) _image.fillAmount = Mathf.Lerp(_image.fillAmount, ringFillPercent, 2 * Time.deltaTime);
             numFrames++;
         }
     }

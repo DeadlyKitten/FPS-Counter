@@ -33,6 +33,12 @@ namespace FPS_Counter
             displayRingOption.SetValue += delegate (bool value) { Config.ShowRing = value; };
             displayRingOption.EnabledText = "Yes";
             displayRingOption.DisabledText = "No";
+
+            var useColorsOption = subMenuFPS.AddBool("Use Colors");
+            useColorsOption.GetValue += delegate { return Config.UseColors; };
+            useColorsOption.SetValue += delegate (bool value) { Config.UseColors = value; };
+            useColorsOption.EnabledText = "Yes";
+            useColorsOption.DisabledText = "No";
         }
     }
 }

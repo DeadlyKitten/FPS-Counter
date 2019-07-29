@@ -43,5 +43,18 @@ namespace FPS_Counter
                 config.SetBool(sectionCore, showRing, value);
             }
         }
+
+        static readonly string useColors = "ShowRing";
+        internal static bool UseColors
+        {
+            get
+            {
+                return config.GetBool(sectionCore, useColors, true, true);
+            }
+            set
+            {
+                config.SetBool(sectionCore, useColors, value);
+            }
+        }
     }
 }
