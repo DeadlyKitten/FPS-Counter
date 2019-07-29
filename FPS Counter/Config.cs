@@ -44,7 +44,7 @@ namespace FPS_Counter
             }
         }
 
-        static readonly string useColors = "ShowRing";
+        static readonly string useColors = "UseColors";
         internal static bool UseColors
         {
             get
