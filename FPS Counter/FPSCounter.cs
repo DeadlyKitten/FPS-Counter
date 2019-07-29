@@ -38,7 +38,6 @@ namespace FPS_Counter
         private void Init()
         {
             _targetFramerate = (int) XRDevice.refreshRate;
-            _targetFramerate = 400;
             _updateRate = Config.UpdateRate;
             _displayRing = Config.ShowRing;
             _useColors = Config.UseColors;
@@ -69,6 +68,7 @@ namespace FPS_Counter
             _counter.transform.localScale *= .12f;
             _counter.fontSize = 2.5f;
             _counter.color = Color.white;
+            _counter.lineSpacing = -50f;
             _counter.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1f);
             _counter.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 1f);
             _counter.enableWordWrapping = false;
@@ -81,7 +81,7 @@ namespace FPS_Counter
                 _percent.transform.SetParent(_counter.transform);
                 _percent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 2f);
                 _percent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 2f);
-                _percent.transform.localScale = new Vector3(5f, 5f, 5f);
+                _percent.transform.localScale = new Vector3(4f, 4f, 4f);
                 _percent.transform.localPosition = Vector3.zero;
 
                 _image.sprite = image?.sprite;
@@ -103,31 +103,28 @@ namespace FPS_Counter
             {
                 var fps = Mathf.Round(numFrames / (Time.time - lastFrameTime));
                 _counter.text = $"FPS\n{fps}";
-                if (_displayRing)
+                ringFillPercent = fps / (float)_targetFramerate;
+                if (_useColors)
                 {
-                    ringFillPercent = fps / (float)_targetFramerate;
-                    if (_useColors)
+                    if (ringFillPercent > 0.95f)
                     {
-                        if (ringFillPercent > 0.95f)
-                        {
-                            _image.color = Color.green;
-                            _counter.color = Color.green;
-                        }
-                        else if (ringFillPercent > 0.7f)
-                        {
-                            _image.color = Color.yellow;
-                            _counter.color = Color.yellow;
-                        }
-                        else if (ringFillPercent > 0.5f)
-                        {
-                            _image.color = new Color(1, 0.64f, 0);
-                            _counter.color = new Color(1, 0.64f, 0);
-                        }
-                        else
-                        {
-                            _image.color = Color.red;
-                            _counter.color = Color.red;
-                        }
+                        _image?.SetColor(Color.green);
+                        _counter.color = Color.green;
+                    }
+                    else if (ringFillPercent > 0.7f)
+                    {
+                        _image?.SetColor(Color.yellow);
+                        _counter.color = Color.yellow;
+                    }
+                    else if (ringFillPercent > 0.5f)
+                    {
+                        _image?.SetColor(new Color(1, 0.64f, 0));
+                        _counter.color = new Color(1, 0.64f, 0);
+                    }
+                    else
+                    {
+                        _image?.SetColor(Color.red);
+                        _counter.color = Color.red;
                     }
                 }
                 lastFrameTime = nextCounterUpdate;
@@ -137,6 +134,14 @@ namespace FPS_Counter
 
             if (_displayRing) _image.fillAmount = Mathf.Lerp(_image.fillAmount, ringFillPercent, 2 * Time.deltaTime);
             numFrames++;
+        }
+    }
+
+    static class ExtensionMethods
+    {
+        public static void SetColor(this Image image, Color color)
+        {
+            image.color = color;
         }
     }
 }
