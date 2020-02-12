@@ -12,6 +12,7 @@ namespace FPS_Counter
 {
     public class Plugin : IBeatSaberPlugin
     {
+        internal static bool IsCountersPlusPresent { get; set; }
         public static string PluginName => "FPS Counter";
 
         public void Init(IPALogger logger)
@@ -25,16 +26,13 @@ namespace FPS_Counter
 
         public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
         {
-            if (Utils.IsPluginEnabled("Counters+"))
+            if (nextScene.name == "GameCore")
             {
-                if (nextScene.name == "GameCore")
-                {
-                    new GameObject("FPS Counter").AddComponent<Behaviours.FPSCounter>();
-                }
-                else if (nextScene.name == "MenuViewControllers" && prevScene.name == "EmptyTransition")
-                {
-                    BSMLSettings.instance.AddSettingsMenu(PluginName, "FPS_Counter.Settings.UI.Views.mainsettings.bsml", MainSettings.instance);
-                }
+                new GameObject("FPS Counter").AddComponent<Behaviours.FPSCounter>();
+            }
+            else if (nextScene.name == "MenuViewControllers" && prevScene.name == "EmptyTransition")
+            {
+                BSMLSettings.instance.AddSettingsMenu(PluginName, "FPS_Counter.Settings.UI.Views.mainsettings.bsml", MainSettings.instance);
             }
         }
 
@@ -50,11 +48,12 @@ namespace FPS_Counter
             Logger.log.Info("Checking for Counters+");
             if (Utils.IsPluginEnabled("Counters+"))
             {
+                IsCountersPlusPresent = true;
                 AddCustomCounter();
             }
             else
             {
-                Logger.log.Error("Counters+ not installed");
+                Logger.log.Warn("Counters+ not installed");
             }
         }
 

@@ -67,14 +67,14 @@ namespace FPS_Counter.Behaviours
 
             TextHelper.CreateText(out counter, canvas, Vector2.zero);
             counter.alignment = TextAlignmentOptions.Center;
-            counter.transform.localScale *= 1;
+            counter.transform.localScale *= Plugin.IsCountersPlusPresent ? 1 : 0.12f;
             counter.fontSize = 2.5f;
             counter.color = Color.white;
             counter.lineSpacing = -50f;
             counter.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1f);
             counter.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 1f);
             counter.enableWordWrapping = false;
-            counter.transform.localPosition = Vector3.zero;
+            counter.transform.localPosition = Plugin.IsCountersPlusPresent ? Vector3.zero : new Vector3(-0.1f, 3.5f, 8f);
 
             if (Configuration.ShowRing)
             {
