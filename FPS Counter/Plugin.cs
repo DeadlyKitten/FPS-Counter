@@ -1,72 +1,81 @@
-﻿using System.Linq;
+﻿using BeatSaberMarkupLanguage.Settings;
+using CountersPlus.Custom;
+using FPS_Counter.Settings;
+using FPS_Counter.Settings.UI;
+using FPS_Counter.Utilities;
 using IPA;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = FPS_Counter.Logger;
-using CountersPlus.Custom;
+using IPALogger = IPA.Logging.Logger;
 
 namespace FPS_Counter
 {
     public class Plugin : IBeatSaberPlugin
     {
-        public static bool CountersPlusInstalled { get; private set; } = false;
-        private FPSCounter _counter;
+        public static string PluginName => "FPS Counter";
 
-        public void Init(IPA.Logging.Logger logger)
+        public void Init(IPALogger logger)
         {
-            Logger.logger = logger;
-            Config.Init();
+            Logger.log = logger;
+            Configuration.Init();
         }
 
-        public void OnApplicationStart()
-        {
-            Logger.Log("Checking for Counters+");
-            if (IPA.Loader.PluginManager.AllPlugins.Any(x => x.Metadata.Id == "Counters+"))
-            {
-                Logger.Log("Counters+ is installed");
-                CountersPlusInstalled = true;
-                AddCustomCounter();
-            }
-            else
-                Logger.Log("Counters+ not installed");
-        }
-
-        public void OnApplicationQuit() { }
-
-        public void OnFixedUpdate() { }
-
-        public void OnUpdate() { }
+        public void OnApplicationStart() => Load();
+        public void OnApplicationQuit() => Unload();
 
         public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
         {
-            if (nextScene.name == "GameCore")
+            if (Utils.IsPluginEnabled("Counters+"))
             {
-                _counter = new GameObject("FPS Counter").AddComponent<FPSCounter>();
+                if (nextScene.name == "GameCore")
+                {
+                    new GameObject("FPS Counter").AddComponent<Behaviours.FPSCounter>();
+                }
+                else if (nextScene.name == "MenuViewControllers" && prevScene.name == "EmptyTransition")
+                {
+                    BSMLSettings.instance.AddSettingsMenu(PluginName, "FPS_Counter.Settings.UI.Views.mainsettings.bsml", MainSettings.instance);
+                }
             }
         }
 
-        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
+        public void OnUpdate() { }
+        public void OnFixedUpdate() { }
+        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode) { }
+        public void OnSceneUnloaded(Scene scene) { }
+
+        private void Load()
         {
-            if (scene.name == "MenuCore")
-                SettingsMenu.CreateSettingsUI();
+            Configuration.Load();
+
+            Logger.log.Info("Checking for Counters+");
+            if (Utils.IsPluginEnabled("Counters+"))
+            {
+                AddCustomCounter();
+            }
+            else
+            {
+                Logger.log.Error("Counters+ not installed");
+            }
         }
 
-        public void OnSceneUnloaded(Scene scene)
+        private void Unload()
         {
-            if (scene.name == "MenuCore")
-                SettingsMenu.initialized = false;
+            Configuration.Save();
         }
 
-        void AddCustomCounter()
+        private void AddCustomCounter()
         {
-            Logger.Log("Creating Custom Counter");
+            Logger.log.Info("Creating Custom Counter");
+
             CustomCounter counter = new CustomCounter
             {
                 SectionName = "fpsCounter",
                 Name = "FPS Counter",
                 BSIPAMod = this,
                 Counter = "FPS Counter",
+                Icon_ResourceName = "FPS_Counter.Resources.icon.png"
             };
+
             CustomCounterCreator.Create(counter);
         }
     }
