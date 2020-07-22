@@ -18,7 +18,7 @@ namespace FPS_Counter.Behaviours
 
         private float numFrames;
         private float lastFrameTime;
-        private float nextCounterUpdate = Time.time + Configuration.UpdateRate;
+        private float nextCounterUpdate = Time.time + Configuration.Instance.UpdateRate;
         private float ringFillPercent = 1;
 
         private void Awake()
@@ -53,7 +53,7 @@ namespace FPS_Counter.Behaviours
             gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1f);
             gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 1f);
 
-            Image image = null;
+            Image image = null!;
             try
             {
                 ScoreMultiplierUIController scoreMultiplier = Resources.FindObjectsOfTypeAll<ScoreMultiplierUIController>().First();
@@ -76,7 +76,7 @@ namespace FPS_Counter.Behaviours
             counter.enableWordWrapping = false;
             counter.transform.localPosition = Plugin.IsCountersPlusPresent ? Vector3.zero : new Vector3(-0.1f, 3.5f, 8f);
 
-            if (Configuration.ShowRing)
+            if (Configuration.Instance.ShowRing)
             {
                 percent = new GameObject();
                 this.image = percent.AddComponent<Image>();
@@ -105,7 +105,7 @@ namespace FPS_Counter.Behaviours
                 counter.text = $"FPS\n{fps}";
                 ringFillPercent = fps / targetFramerate;
 
-                if (Configuration.UseColors)
+                if (Configuration.Instance.UseColors)
                 {
                     Color color;
 
@@ -131,11 +131,11 @@ namespace FPS_Counter.Behaviours
                 }
 
                 lastFrameTime = nextCounterUpdate;
-                nextCounterUpdate += Configuration.UpdateRate;
+                nextCounterUpdate += Configuration.Instance.UpdateRate;
                 numFrames = 0;
             }
 
-            if (Configuration.ShowRing)
+            if (Configuration.Instance.ShowRing)
             {
                 if (image)
                 {

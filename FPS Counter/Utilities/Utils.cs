@@ -1,5 +1,4 @@
 ﻿using IPA.Loader;
-using IPA.Old;
 
 namespace FPS_Counter.Utilities
 {
@@ -12,10 +11,10 @@ namespace FPS_Counter.Utilities
         {
             if (IsPluginPresent(pluginName))
             {
-                PluginLoader.PluginInfo pluginInfo = PluginManager.GetPluginFromId(pluginName);
-                if (pluginInfo?.Metadata != null)
+                var pluginMetadata = PluginManager.GetPluginFromId(pluginName);
+                if (pluginMetadata != null)
                 {
-                    return PluginManager.IsEnabled(pluginInfo.Metadata);
+                    return PluginManager.IsEnabled(pluginMetadata);
                 }
             }
 
@@ -36,7 +35,7 @@ namespace FPS_Counter.Utilities
 
 #pragma warning disable CS0618 // IPA is obsolete
             // Check in old IPA
-            foreach (IPlugin plugin in PluginManager.Plugins)
+            foreach (var plugin in PluginManager.Plugins)
             {
                 if (plugin.Name == pluginName)
                 {

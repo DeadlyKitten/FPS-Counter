@@ -7,22 +7,22 @@ namespace FPS_Counter.Settings.UI
         [UIValue("update-rate")]
         public float FPSUpdateRate
         {
-            get => Configuration.UpdateRate;
-            set => Configuration.UpdateRate = value;
+            get => Configuration.Instance.UpdateRate;
+            set => Configuration.Instance.UpdateRate = value;
         }
 
         [UIValue("show-ring")]
         public bool ShowFPSRing
         {
-            get => Configuration.ShowRing;
-            set => Configuration.ShowRing = value;
+            get => Configuration.Instance.ShowRing;
+            set => Configuration.Instance.ShowRing = value;
         }
 
         [UIValue("use-colors")]
         public bool FPSUseColors
         {
-            get => Configuration.UseColors;
-            set => Configuration.UseColors = value;
+            get => Configuration.Instance.UseColors;
+            set => Configuration.Instance.UseColors = value;
         }
     }
 }
