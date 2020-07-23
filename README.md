@@ -1,6 +1,20 @@
 # FPS-Counter
 A Beat Saber mod to show your fps in-game.
 
+## Installation
+
+Below, you can find the few mods that this mods requires. You'll also find the versions that I used to test.
+
+ - BS Utils v1.4.9 or higher
+ - BeatSaberMarkupLanguage v1.3.2 or higher
+ - Counters+ v1.9.1 (Optional)
+
+The installation itself is fairly simple.
+
+ 1) Grab the latest plugin release from [the releases page](https://github.com/ErisApps/FPS-Counter/releases)
+ 2) Drop the .dll file in the Plugins folder of your Beat Saber installation.
+ 3) Boot it up (or reboot)
+
 ## For developers
 
 ### Contributing to FPS-Counter
@@ -29,3 +43,10 @@ If you plan on adding any new dependencies which are located in the Beat Saber d
 </Reference>
 ...
 ```
+
+
+## Credits
+
+[**@DeadlyKitten**](https://github.com/DeadlyKitten) for creating the original mod
+
+[**@Pespiri**](https://github.com/Pespiri) for updating the mod to the more recent BS 1.7.0 and making the Counters+ mod optional
