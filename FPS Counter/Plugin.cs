@@ -1,73 +1,89 @@
-﻿using System.Linq;
+﻿using System;
+using System.Reflection;
+using BeatSaberMarkupLanguage.Settings;
+using CountersPlus.Custom;
+using FPS_Counter.Settings;
+using FPS_Counter.Settings.UI;
+using FPS_Counter.Utilities;
 using IPA;
+using IPA.Config;
+using IPA.Config.Stores;
+using IPA.Loader;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Logger = FPS_Counter.Logger;
-using CountersPlus.Custom;
+using IPALogger = IPA.Logging.Logger;
 
 namespace FPS_Counter
 {
-    public class Plugin : IBeatSaberPlugin
-    {
-        public static bool CountersPlusInstalled { get; private set; } = false;
-        private FPSCounter _counter;
+	[Plugin(RuntimeOptions.SingleStartInit)]
+	public class Plugin
+	{
+		private static PluginMetadata _metadata;
+		private static string? _name;
+		private static Version? _version;
 
-        public void Init(IPA.Logging.Logger logger)
-        {
-            Logger.logger = logger;
-            Config.Init();
-        }
+		internal static bool IsCountersPlusPresent { get; set; }
+		public static string PluginName => _name ??= _metadata?.Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 
-        public void OnApplicationStart()
-        {
-            Logger.Log("Checking for Counters+");
-            if (IPA.Loader.PluginManager.AllPlugins.Any(x => x.Metadata.Id == "Counters+"))
-            {
-                Logger.Log("Counters+ is installed");
-                CountersPlusInstalled = true;
-                AddCustomCounter();
-            }
-            else
-                Logger.Log("Counters+ not installed");
-        }
 
-        public void OnApplicationQuit() { }
+		[Init]
+		public void Init(IPALogger logger, PluginMetadata metaData, Config config)
+		{
+			_metadata = metaData;
+			Logger.log = logger;
 
-        public void OnFixedUpdate() { }
+			Configuration.Instance = config.Generated<Configuration>();
+		}
 
-        public void OnUpdate() { }
+		[OnStart]
+		public void OnStart()
+		{
+			Logger.log.Info("Checking for Counters+");
+			if (Utils.IsPluginEnabled("Counters+"))
+			{
+				IsCountersPlusPresent = true;
+				AddCustomCounter();
+			}
+			else
+			{
+				Logger.log.Warn("Counters+ not installed");
+			}
 
-        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
-        {
-            if (nextScene.name == "GameCore")
-            {
-                _counter = new GameObject("FPS Counter").AddComponent<FPSCounter>();
-            }
-        }
+			BS_Utils.Utilities.BSEvents.lateMenuSceneLoadedFresh += BSEventsOnlateMenuSceneLoadedFresh;
+			BS_Utils.Utilities.BSEvents.gameSceneLoaded += BSEventsOngameSceneLoaded;
+		}
 
-        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
-        {
-            if (scene.name == "MenuCore")
-                SettingsMenu.CreateSettingsUI();
-        }
+		[OnExit]
+		public void OnExit()
+		{
+			BS_Utils.Utilities.BSEvents.lateMenuSceneLoadedFresh -= BSEventsOnlateMenuSceneLoadedFresh;
+			BS_Utils.Utilities.BSEvents.gameSceneLoaded -= BSEventsOngameSceneLoaded;
+		}
 
-        public void OnSceneUnloaded(Scene scene)
-        {
-            if (scene.name == "MenuCore")
-                SettingsMenu.initialized = false;
-        }
+		private void BSEventsOngameSceneLoaded()
+		{
+			new GameObject("FPS Counter").AddComponent<Behaviours.FPSCounter>();
+		}
 
-        void AddCustomCounter()
-        {
-            Logger.Log("Creating Custom Counter");
-            CustomCounter counter = new CustomCounter
-            {
-                SectionName = "fpsCounter",
-                Name = "FPS Counter",
-                BSIPAMod = this,
-                Counter = "FPS Counter",
-            };
-            CustomCounterCreator.Create(counter);
-        }
-    }
+		private void BSEventsOnlateMenuSceneLoadedFresh(ScenesTransitionSetupDataSO obj)
+		{
+			BSMLSettings.instance.AddSettingsMenu(PluginName, "FPS_Counter.Settings.UI.Views.mainsettings.bsml", MainSettings.instance);
+		}
+
+		private void AddCustomCounter()
+		{
+			Logger.log.Info("Creating Custom Counter");
+
+			CustomCounter counter = new CustomCounter
+			{
+				SectionName = "fpsCounter",
+				Name = PluginName,
+				BSIPAMod = _metadata,
+				Counter = PluginName,
+				Icon_ResourceName = "FPS_Counter.Resources.icon.png"
+			};
+
+			CustomCounterCreator.Create(counter);
+		}
+	}
 }
